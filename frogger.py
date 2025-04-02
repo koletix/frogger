@@ -14,7 +14,21 @@ game_font = pygame.font.SysFont(font_name, 20)
 info_font = pygame.font.SysFont(font_name, 20)
 menu_font = pygame.font.SysFont(font_name, 20)
 
-screen = pygame.display.set_mode((448,546), 0, 32)
+screen_width, screen_height = pygame.display.Info().current_w, pygame.display.Info().current_h
+screen = pygame.display.set_mode((screen_width, screen_height), pygame.FULLSCREEN, 32)
+
+def scale_sprite(sprite, screen_width):
+    scale_factor = screen_width / 448  # Assuming original width was 448
+    new_width = int(sprite.get_width() * scale_factor)
+    new_height = int(sprite.get_height() * scale_factor)
+    return pygame.transform.scale(sprite, (new_width, new_height))
+
+# Game boundaries based on the new screen size
+screen_width, screen_height = pygame.display.Info().current_w, pygame.display.Info().current_h
+game_boundary_right = screen_width - 40  # Set boundary slightly inward
+game_boundary_left = 0
+game_boundary_top = 40  # Start after the upper panel area
+game_boundary_bottom = screen_height - 50  # Start above the bottom bar (time and lives)
 
 
 # Load the custom font
@@ -26,6 +40,7 @@ menu_font = pygame.font.Font(font_path, 30)  # For the menu font
 
 # --- Carregando imagens ---
 background_filename = './frogger/images/bg2.png'
+
 frog_filename = './frogger/images/sprite_sheets_up.png'
 arrived_filename = './frogger/images/frog_arrived.png'
 car1_filename = './frogger/images/car1.png'
@@ -43,14 +58,17 @@ tortu_vida = './frogger/images/frog_arrived.png'  # Ruta a la imagen de relleno
 
 frog_image = pygame.image.load(frog_filename).convert_alpha()
 background = pygame.image.load(background_filename).convert()
+background = pygame.transform.scale(background, (screen_width, screen_height))
+
 sprite_sapo = pygame.image.load(frog_filename).convert_alpha()
 sprite_arrived = pygame.image.load(arrived_filename).convert_alpha()
-sprite_car1 = pygame.transform.scale(pygame.image.load(car1_filename).convert_alpha(), (38, 30))
-sprite_car2 = pygame.transform.scale(pygame.image.load(car2_filename).convert_alpha(), (38, 30))
-sprite_car3 = pygame.transform.scale(pygame.image.load(car3_filename).convert_alpha(), (38, 30))
-sprite_car4 = pygame.transform.scale(pygame.image.load(car4_filename).convert_alpha(), (38, 30))
-sprite_car5 = pygame.transform.scale(pygame.image.load(car5_filename).convert_alpha(), (55, 30))
-sprite_plataform = pygame.transform.scale(pygame.image.load(plataform_filename).convert_alpha(), (100, 30))
+#sprite_car1 = scale_sprite(pygame.image.load(car1_filename).convert_alpha(), screen_width)
+sprite_car1 = scale_sprite(pygame.image.load(car1_filename).convert_alpha(), screen_width)
+sprite_car2 = scale_sprite(pygame.image.load(car2_filename).convert_alpha(), screen_width)
+sprite_car3 = scale_sprite(pygame.image.load(car3_filename).convert_alpha(), screen_width)
+sprite_car4 = scale_sprite(pygame.image.load(car4_filename).convert_alpha(), screen_width)
+sprite_car5 = scale_sprite(pygame.image.load(car5_filename).convert_alpha(), screen_width)
+sprite_plataform = scale_sprite(pygame.image.load(plataform_filename).convert_alpha(), screen_width)
 sprite_turtle = pygame.transform.scale(pygame.image.load(turtle_filename).convert_alpha(), (30, 30))  # Escalar la tortuga si es necesario
 # Escalar la imagen del arbusto a un tamaño mayor
 sprite_home = pygame.transform.scale(pygame.image.load('./frogger/images/Home.png').convert_alpha(), (70, 30))  # Cambiar dimensiones
@@ -66,6 +84,8 @@ trilha_sound = pygame.mixer.Sound('./frogger/sounds/guimo.wav')
 
 pygame.display.set_caption('Frogger')
 clock = pygame.time.Clock()
+
+
 
 
 class Object():
@@ -124,25 +144,21 @@ class Frog(Object):
         if self.animation_counter == 0:
             self.updateSprite(key_pressed)
         self.incAnimationCounter()
+
         if key_up == 1:
             if key_pressed == "up":
-                if self.position[1] > 39:
-                    self.position[1] = self.position[1]-13
+                if self.position[1] > game_boundary_top:
+                    self.position[1] -= 13
             elif key_pressed == "down":
-                if self.position[1] < 473:
-                    self.position[1] = self.position[1]+13
-            if key_pressed == "left":
-                if self.position[0] > 2:
-                    if self.animation_counter == 2:
-                        self.position[0] = self.position[0]-13
-                    else:
-                        self.position[0] = self.position[0]-14
+                if self.position[1] < game_boundary_bottom:
+                    self.position[1] += 13
+            elif key_pressed == "left":
+                if self.position[0] > game_boundary_left:
+                    self.position[0] -= 14
             elif key_pressed == "right":
-                if self.position[0] < 401:
-                    if self.animation_counter == 2:
-                        self.position[0] = self.position[0]+13
-                    else:
-                        self.position[0] = self.position[0]+14
+                if self.position[0] < game_boundary_right:
+                    self.position[0] += 14
+
 
     def animateFrog(self, key_pressed, key_up):
         if self.animation_counter != 0:
@@ -290,10 +306,12 @@ class Plataform(Object):
         self.way = way
 
     def move(self, speed):
-        if self.way == "right":
-            self.position[0] = self.position[0] + speed  # Troncos van a la derecha
-        elif self.way == "left":
-            self.position[0] = self.position[0] - speed  # Tortugas van a la izquierda
+        if self.way == "right" and self.position[0] < game_boundary_right:
+            self.position[0] += speed  # Usa directamente 'speed' sin 'factor'
+        elif self.way == "left" and self.position[0] > game_boundary_left:
+            self.position[0] -= speed  # Usa directamente 'speed' sin 'factor'
+
+
 
 
 class Game():
@@ -337,10 +355,14 @@ def moveList(list,speed):
 
 def destroyEnemys(list):
     for i in list:
-        if i.position[0] < -80:
+        # Elimina el enemigo si se sale por el borde izquierdo (fuera de la pantalla)
+        if i.position[0] + i.sprite.get_width() < 0:  # Si la posición + el ancho del enemigo es menor que 0
             list.remove(i)
-        elif i.position[0] > 516:
+        # Elimina el enemigo si se sale por el borde derecho (fuera de la pantalla)
+        elif i.position[0] > screen_width:  # Si la posición del enemigo es mayor que el ancho de la pantalla
             list.remove(i)
+
+
 
 def destroyPlataforms(list):
     for i in list:
@@ -355,27 +377,27 @@ def createEnemys(list,enemys,game):
         if tick <= 0:
             if i == 0:
                 list[0] = (40*game.speed)/game.level
-                position_init = [506, 436]  # entra por la derecha
+                position_init = [screen_width - sprite_car1.get_width(), 710]  # Inicia en el borde derecho visible
                 enemy = Enemy(position_init, sprite_car1, "left", 1)
                 enemys.append(enemy)
             elif i == 1:
                 list[1] = (30*game.speed)/game.level
-                position_init = [-80, 397]  # entra por la izquierda
+                position_init = [-sprite_car1.get_width(), 650]  # entra por la izquierda
                 enemy = Enemy(position_init, sprite_car2, "right", 2)
                 enemys.append(enemy)
             elif i == 2:
                 list[2] = (40*game.speed)/game.level
-                position_init = [506, 357]  # entra por la derecha
+                position_init = [screen_width - sprite_car1.get_width(), 600]  # entra por la derecha
                 enemy = Enemy(position_init, sprite_car3, "left", 2)
                 enemys.append(enemy)
             elif i == 3:
                 list[3] = (30*game.speed)/game.level
-                position_init = [-80, 318]  # entra por la izquierda
+                position_init = [-sprite_car1.get_width(), 545]  # entra por la izquierda
                 enemy = Enemy(position_init, sprite_car4, "right", 1)
                 enemys.append(enemy)
             elif i == 4:
                 list[4] = (50*game.speed)/game.level
-                position_init = [506, 280]  # entra por la derecha
+                position_init = [screen_width - sprite_car1.get_width(), 480]  # entra por la derecha
                 enemy = Enemy(position_init, sprite_car5, "left", 1)
                 enemys.append(enemy)
 
@@ -753,3 +775,4 @@ while True:
         screen.blit(text_reiniciar, (70, 250))
 
         pygame.display.update()
+
