@@ -23,6 +23,8 @@ def scale_sprite(sprite, screen_width):
     new_height = int(sprite.get_height() * scale_factor)
     return pygame.transform.scale(sprite, (new_width, new_height))
 
+
+
 # Game boundaries based on the new screen size
 screen_width, screen_height = pygame.display.Info().current_w, pygame.display.Info().current_h
 game_boundary_right = screen_width - 40  # Set boundary slightly inward
@@ -61,7 +63,6 @@ background = pygame.image.load(background_filename).convert()
 background = pygame.transform.scale(background, (screen_width, screen_height))
 
 sprite_sapo = pygame.image.load(frog_filename).convert_alpha()
-#sprite_sapo = pygame.transform.scale(sprite_sapo, (120,120)) #umentar el tamaño de la rana (ajustar según desees)
 
 
 sprite_arrived = pygame.image.load(arrived_filename).convert_alpha()
@@ -156,7 +157,7 @@ class Frog(Object):
         if key_up == 1:
             if key_pressed == "up":
                 if self.position[1] > game_boundary_top:
-                    self.position[1] -= 13
+                    self.position[1] -= 16
             elif key_pressed == "down":
                 if self.position[1] < game_boundary_bottom:
                     self.position[1] += 13
@@ -616,32 +617,21 @@ def frogInTheLake(frog, plataforms, game):
 
 
 
-def frogArrived(frog,chegaram,game):
-    if frog.position[0] > 33 and frog.position[0] < 53:
-        position_init = [43,7]
-        createArrived(frog,chegaram,game,position_init)
+def frogArrived(frog, chegam, game):
+    # Iterar sobre las zonas seguras
+    for zone in safe_zones:
+        # Verifica si la posición de la rana está dentro de la zona segura (cuadro rojo)
+        if zone.rect().colliderect(frog.rect()):
+            # Si la rana entra en una zona segura, marca la llegada
+            createArrived(frog, chegam, game, zone.position)
+            return  # Salir de la función después de marcar la llegada
 
-    elif frog.position[0] > 115 and frog.position[0] < 135:
-        position_init = [125,7]
-        createArrived(frog,chegaram,game,position_init)
+    # Si no está en ninguna zona segura, resetea la rana
+    frog.position[1] = 46
+    frog.animation_counter = 0
+    frog.animation_tick = 1
+    frog.can_move = 1
 
-    elif frog.position[0] > 197 and frog.position[0] < 217:
-        position_init = [207,7]
-        createArrived(frog,chegaram,game,position_init)
-
-    elif frog.position[0] > 279 and frog.position[0] < 299:
-        position_init = [289,7]
-        createArrived(frog,chegaram,game,position_init)
-
-    elif frog.position[0] > 361 and frog.position[0] < 381:
-        position_init = [371,7]
-        createArrived(frog,chegaram,game,position_init)
-
-    else:
-        frog.position[1] = 46
-        frog.animation_counter = 0
-        frog.animation_tick = 1
-        frog.can_move = 1
 
 
 def whereIsTheFrog(frog):
@@ -665,6 +655,25 @@ def whereIsTheFrog(frog):
     elif frog.position[1] <= lake_limit and frog.position[1] > destination_limit:  # En la zona de destino
         frogArrived(frog, chegaram, game)
 
+
+##BORRAR
+class SafeZone(Object):
+    def __init__(self, position):
+        self.position = position
+        self.size = 50  # Tamaño del cuadrado
+        self.color = (255, 0, 0)  # Color rojo del cuadrado
+
+    def draw(self):
+        pygame.draw.rect(screen, self.color, (self.position[0], self.position[1], self.size, self.size))  # Dibuja el cuadrado en la pantalla
+
+# Crear 5 zonas seguras con coordenadas iniciales
+safe_zones = [
+    SafeZone([60, screen_height-870]),  
+    SafeZone([410, screen_height-870]),  
+    SafeZone([775, screen_height-870]),  
+    SafeZone([1125, screen_height-870]),  
+    SafeZone([1478, screen_height-870]),  
+]
 
 
 
@@ -812,6 +821,9 @@ while True:
         screen.blit(background, (0, 0))
         #screen.blit(text_info1, (10, 520))
 
+        for zone in safe_zones:
+            zone.draw()  # Dibuja cada cuadro en la pantalla
+
         # Dibuja las vidas restantes
         draw_lives(frog, 40, screen_height - 50)
         # Dibuja los enemigos, plataformas y arbustos
@@ -833,6 +845,7 @@ while True:
         pygame.display.update()
         time_passed = clock.tick(30)
 
+
     while gameInit == 1:
         for event in pygame.event.get():
             if event.type == QUIT:
@@ -847,5 +860,7 @@ while True:
         screen.blit(text, (75, 120))
         screen.blit(text_points, (10, 170))
         screen.blit(text_reiniciar, (70, 250))
+
+
 
         pygame.display.update()
