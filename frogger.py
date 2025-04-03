@@ -50,7 +50,7 @@ car4_filename = './frogger/images/car4.png'
 car5_filename = './frogger/images/car5.png'
 plataform_filename = './frogger/images/tronco2.png'
 turtle_filename = './frogger/images/Turtle_03.png'  # Nueva imagen de tortuga
-home_filename = './frogger/images/Home.png'  # Imagen de los arbustos
+home_filename = './frogger/images/Home.png'  # Imagen de los arbustos ################
 fill_filename = './frogger/images/relleno.png'  # Ruta a la imagen de relleno
 
 tortu_vida = './frogger/images/frog_arrived.png'  # Ruta a la imagen de relleno
@@ -77,9 +77,10 @@ sprite_plataform = scale_sprite(pygame.image.load(plataform_filename).convert_al
 sprite_turtle= scale_sprite(pygame.image.load(turtle_filename).convert_alpha(), screen_width)
 #sprite_turtle = pygame.transform.scale(pygame.image.load(turtle_filename).convert_alpha(), (30, 30))  # Escalar la tortuga si es necesario
 # Escalar la imagen del arbusto a un tamaño mayor
-sprite_home = pygame.transform.scale(pygame.image.load('./frogger/images/Home.png').convert_alpha(), (70, 30))  # Cambiar dimensiones
+sprite_home = scale_sprite(pygame.image.load(home_filename).convert_alpha(), screen_width)
+#sprite_home = pygame.transform.scale(pygame.image.load('./frogger/images/Home.png').convert_alpha(), (70, 30))  # Cambiar dimensiones
 # --- Escalar la imagen de relleno ---
-sprite_fill = pygame.transform.scale(pygame.image.load('./frogger/images/relleno.png').convert_alpha(), (50, 29))  # Ajustar el tamaño
+sprite_fill = pygame.transform.scale(pygame.image.load('./frogger/images/relleno.png').convert_alpha(), (130, 85))  # Ajustar el tamaño
 sprite_tortuvida= pygame.image.load(tortu_vida).convert_alpha()
 sprite_tortuvida = pygame.transform.flip(sprite_tortuvida, False, True)
 sprite_tortuvida = pygame.transform.scale(sprite_tortuvida, (int(sprite_tortuvida.get_width() * 1.5), int(sprite_tortuvida.get_height() * 1.5)))
@@ -201,7 +202,7 @@ class Frog(Object):
         self.can_move = 1
 
     def setPositionToInitialPosition(self):
-        self.position = [207, 475]
+        self.position = [770, screen_height - 100]
 
     def draw(self):
         current_sprite = self.animation_counter * 30
@@ -463,65 +464,123 @@ def createPlataform(list, plataforms, game, homes):
 
             # Agregar los arbustos en la parte inferior de la pantalla
             # Cambiar la posición de los arbustos a la parte superior de la pantalla
-            position_init_fill = [0, 0]  # Coloca el relleno después del primer arbusto
-            fill_obj = Object(position_init_fill, sprite_fill)  # Crear el objeto de relleno
-            homes.append(fill_obj)
 
-            position_init_fill = [10, 0]  # Coloca el relleno después del primer arbusto
-            fill_obj = Object(position_init_fill, sprite_fill)  # Crear el objeto de relleno
-            homes.append(fill_obj)
-
-            position_init_home = [22.5, 0]  # Mover a la parte superior izquierda
+            position_init_home = [0, 0]  # Mover a la parte superior izquierda
             home_obj = Home(position_init_home, sprite_home)  # Crear el objeto de los arbustos
             homes.append(home_obj)  # Agregar a la lista de arbustos
 
-            position_init_fill = [90, 0]  # Coloca el relleno después del primer arbusto
+            position_init_fill = [171, 0]  # Coloca el relleno después del primer arbusto
             fill_obj = Object(position_init_fill, sprite_fill)  # Crear el objeto de relleno
             homes.append(fill_obj)
 
-
-                        # Agregar el segundo arbusto después del primero
-            position_init_home2 = [104, 0]  # Mover un poco más a la derecha
-            home_obj2 = Home(position_init_home2, sprite_home)  # Crear el segundo objeto de los arbustos
-            homes.append(home_obj2)  # Agregar el segundo arbusto
-
-
-            position_init_fill = [174, 0]  # Coloca el relleno después del primer arbusto
+            position_init_fill = [205, 0]  # Coloca el relleno después del primer arbusto
             fill_obj = Object(position_init_fill, sprite_fill)  # Crear el objeto de relleno
             homes.append(fill_obj)
 
-
-            position_init_home3 = [188, 0]  # Mover un poco más a la derecha
-            home_obj3 = Home(position_init_home3, sprite_home)  # Crear el segundo objeto de los arbustos
-            homes.append(home_obj3)  # Agregar el segundo arbusto
- 
-            position_init_fill = [256, 0]  # Coloca el relleno después del primer arbusto
+            position_init_fill = [239, 0]  # Coloca el relleno después del primer arbusto
             fill_obj = Object(position_init_fill, sprite_fill)  # Crear el objeto de relleno
             homes.append(fill_obj)
 
-            position_init_home4 = [270, 0]  # Mover un poco más a la derecha
-            home_obj4 = Home(position_init_home4, sprite_home)  # Crear el segundo objeto de los arbustos
-            homes.append(home_obj4)  # Agregar el segundo arbusto
+            position_init_fill = [273, 0]  # Coloca el relleno después del primer arbusto
+            fill_obj = Object(position_init_fill, sprite_fill)  # Crear el objeto de relleno
+            homes.append(fill_obj)
 
-            position_init_fill = [336, 0]  # Coloca el relleno después del primer arbusto
+            position_init_fill = [307, 0]  # Coloca el relleno después del primer arbusto
+            fill_obj = Object(position_init_fill, sprite_fill)  # Crear el objeto de relleno
+            homes.append(fill_obj)
+
+            position_init_fill = [316, 0]  # Coloca el relleno después del primer arbusto
             fill_obj = Object(position_init_fill, sprite_fill)  # Crear el objeto de relleno
             homes.append(fill_obj)            
 
-            position_init_home5 = [350, 0]  # Mover un poco más a la derecha
-            home_obj5 = Home(position_init_home5, sprite_home)  # Crear el segundo objeto de los arbustos
-            homes.append(home_obj5)  # Agregar el segundo arbusto            
+            position_init_home = [350, 0]  # Mover a la parte superior izquierda
+            home_obj = Home(position_init_home, sprite_home)  # Crear el objeto de los arbustos
+            homes.append(home_obj)  # Agregar a la lista de arbustos
 
-            position_init_fill = [420, 0]  # Coloca el relleno después del primer arbusto
-            fill_obj = Object(position_init_fill, sprite_fill)  # Crear el objeto de relleno
-            homes.append(fill_obj)   
+            position_init_fill = [521, 0]  # Mover a la parte superior izquierda
+            fill_obj = Home(position_init_fill, sprite_fill)  # Crear el objeto de los arbustos
+            homes.append(fill_obj)  # Agregar a la lista de arbustos
 
-            position_init_fill = [430, 0]  # Coloca el relleno después del primer arbusto
-            fill_obj = Object(position_init_fill, sprite_fill)  # Crear el objeto de relleno
-            homes.append(fill_obj)
 
-            position_init_fill = [440, 0]  # Coloca el relleno después del primer arbusto
-            fill_obj = Object(position_init_fill, sprite_fill)  # Crear el objeto de relleno
-            homes.append(fill_obj)
+            position_init_fill = [555, 0]  # Mover a la parte superior izquierda
+            fill_obj = Home(position_init_fill, sprite_fill)  # Crear el objeto de los arbustos
+            homes.append(fill_obj)  # Agregar a la lista de arbustos
+
+            position_init_fill = [589, 0]  # Mover a la parte superior izquierda
+            fill_obj = Home(position_init_fill, sprite_fill)  # Crear el objeto de los arbustos
+            homes.append(fill_obj)  # Agregar a la lista de arbustos            
+
+            position_init_fill = [623, 0]  # Mover a la parte superior izquierda
+            fill_obj = Home(position_init_fill, sprite_fill)  # Crear el objeto de los arbustos
+            homes.append(fill_obj)  # Agregar a la lista de arbustos    
+
+            position_init_fill = [657, 0]  # Mover a la parte superior izquierda
+            fill_obj = Home(position_init_fill, sprite_fill)  # Crear el objeto de los arbustos
+            homes.append(fill_obj)  # Agregar a la lista de arbustos    
+
+            position_init_fill = [680, 0]  # Mover a la parte superior izquierda
+            fill_obj = Home(position_init_fill, sprite_fill)  # Crear el objeto de los arbustos
+            homes.append(fill_obj)  # Agregar a la lista de arbustos    
+
+            position_init_home = [715, 0]  # Mover a la parte superior izquierda
+            home_obj = Home(position_init_home, sprite_home)  # Crear el objeto de los arbustos
+            homes.append(home_obj)  # Agregar a la lista de arbustos
+
+            position_init_fill = [880, 0]  # Mover a la parte superior izquierda
+            fill_obj = Home(position_init_fill, sprite_fill)  # Crear el objeto de los arbustos
+            homes.append(fill_obj)  # Agregar a la lista de arbustos  
+
+            position_init_fill = [914, 0]  # Mover a la parte superior izquierda
+            fill_obj = Home(position_init_fill, sprite_fill)  # Crear el objeto de los arbustos
+            homes.append(fill_obj)  # Agregar a la lista de arbustos  
+
+            position_init_fill = [948, 0]  # Mover a la parte superior izquierda
+            fill_obj = Home(position_init_fill, sprite_fill)  # Crear el objeto de los arbustos
+            homes.append(fill_obj)  # Agregar a la lista de arbustos  
+
+            position_init_fill = [982, 0]  # Mover a la parte superior izquierda
+            fill_obj = Home(position_init_fill, sprite_fill)  # Crear el objeto de los arbustos
+            homes.append(fill_obj)  # Agregar a la lista de arbustos  
+
+            position_init_fill = [1016, 0]  # Mover a la parte superior izquierda
+            fill_obj = Home(position_init_fill, sprite_fill)  # Crear el objeto de los arbustos
+            homes.append(fill_obj)  # Agregar a la lista de arbustos 
+
+            position_init_fill = [1030, 0]  # Mover a la parte superior izquierda
+            fill_obj = Home(position_init_fill, sprite_fill)  # Crear el objeto de los arbustos
+            homes.append(fill_obj)  # Agregar a la lista de arbustos             
+
+            position_init_home = [1065, 0]  # Mover a la parte superior izquierda
+            home_obj = Home(position_init_home, sprite_home)  # Crear el objeto de los arbustos
+            homes.append(home_obj)  # Agregar a la lista de arbustos   
+
+            position_init_fill = [1235, 0]  # Mover a la parte superior izquierda
+            fill_obj = Home(position_init_fill, sprite_fill)  # Crear el objeto de los arbustos
+            homes.append(fill_obj)  # Agregar a la lista de arbustos       
+
+            position_init_fill = [1269, 0]  # Mover a la parte superior izquierda
+            fill_obj = Home(position_init_fill, sprite_fill)  # Crear el objeto de los arbustos
+            homes.append(fill_obj)  # Agregar a la lista de arbustos     
+
+            position_init_fill = [1303, 0]  # Mover a la parte superior izquierda
+            fill_obj = Home(position_init_fill, sprite_fill)  # Crear el objeto de los arbustos
+            homes.append(fill_obj)  # Agregar a la lista de arbustos                 
+
+            position_init_fill = [1337, 0]  # Mover a la parte superior izquierda
+            fill_obj = Home(position_init_fill, sprite_fill)  # Crear el objeto de los arbustos
+            homes.append(fill_obj)  # Agregar a la lista de arbustos     
+
+            position_init_fill = [1371, 0]  # Mover a la parte superior izquierda
+            fill_obj = Home(position_init_fill, sprite_fill)  # Crear el objeto de los arbustos
+            homes.append(fill_obj)  # Agregar a la lista de arbustos                 
+
+            position_init_fill = [1395, 0]  # Mover a la parte superior izquierda
+            fill_obj = Home(position_init_fill, sprite_fill)  # Crear el objeto de los arbustos
+            homes.append(fill_obj)  # Agregar a la lista de arbustos
+
+            position_init_home = [1415, 0]  # Mover a la parte superior izquierda
+            home_obj = Home(position_init_home, sprite_home)  # Crear el objeto de los arbustos
+            homes.append(home_obj)  # Agregar a la lista de arbustos                        
 
 
 
@@ -778,4 +837,3 @@ while True:
         screen.blit(text_reiniciar, (70, 250))
 
         pygame.display.update()
-
