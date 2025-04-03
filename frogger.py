@@ -61,6 +61,9 @@ background = pygame.image.load(background_filename).convert()
 background = pygame.transform.scale(background, (screen_width, screen_height))
 
 sprite_sapo = pygame.image.load(frog_filename).convert_alpha()
+#sprite_sapo = pygame.transform.scale(sprite_sapo, (120,120)) #umentar el tamaño de la rana (ajustar según desees)
+
+
 sprite_arrived = pygame.image.load(arrived_filename).convert_alpha()
 #sprite_car1 = scale_sprite(pygame.image.load(car1_filename).convert_alpha(), screen_width)
 sprite_car1 = scale_sprite(pygame.image.load(car1_filename).convert_alpha(), screen_width)
@@ -68,14 +71,18 @@ sprite_car2 = scale_sprite(pygame.image.load(car2_filename).convert_alpha(), scr
 sprite_car3 = scale_sprite(pygame.image.load(car3_filename).convert_alpha(), screen_width)
 sprite_car4 = scale_sprite(pygame.image.load(car4_filename).convert_alpha(), screen_width)
 sprite_car5 = scale_sprite(pygame.image.load(car5_filename).convert_alpha(), screen_width)
+
 sprite_plataform = scale_sprite(pygame.image.load(plataform_filename).convert_alpha(), screen_width)
-sprite_turtle = pygame.transform.scale(pygame.image.load(turtle_filename).convert_alpha(), (30, 30))  # Escalar la tortuga si es necesario
+
+sprite_turtle= scale_sprite(pygame.image.load(turtle_filename).convert_alpha(), screen_width)
+#sprite_turtle = pygame.transform.scale(pygame.image.load(turtle_filename).convert_alpha(), (30, 30))  # Escalar la tortuga si es necesario
 # Escalar la imagen del arbusto a un tamaño mayor
 sprite_home = pygame.transform.scale(pygame.image.load('./frogger/images/Home.png').convert_alpha(), (70, 30))  # Cambiar dimensiones
 # --- Escalar la imagen de relleno ---
 sprite_fill = pygame.transform.scale(pygame.image.load('./frogger/images/relleno.png').convert_alpha(), (50, 29))  # Ajustar el tamaño
 sprite_tortuvida= pygame.image.load(tortu_vida).convert_alpha()
 sprite_tortuvida = pygame.transform.flip(sprite_tortuvida, False, True)
+sprite_tortuvida = pygame.transform.scale(sprite_tortuvida, (int(sprite_tortuvida.get_width() * 1.5), int(sprite_tortuvida.get_height() * 1.5)))
 # --- Carregando Efeitos Sonoros ---
 hit_sound = pygame.mixer.Sound('./frogger/sounds/boom.wav')
 agua_sound = pygame.mixer.Sound('./frogger/sounds/agua.wav')
@@ -306,10 +313,15 @@ class Plataform(Object):
         self.way = way
 
     def move(self, speed):
-        if self.way == "right" and self.position[0] < game_boundary_right:
-            self.position[0] += speed  # Usa directamente 'speed' sin 'factor'
-        elif self.way == "left" and self.position[0] > game_boundary_left:
-            self.position[0] -= speed  # Usa directamente 'speed' sin 'factor'
+        # Mueve la plataforma según su dirección
+        if self.way == "right":
+            self.position[0] += speed
+        elif self.way == "left":
+            self.position[0] -= speed
+
+    def draw(self):
+        # Dibuja la plataforma
+        screen.blit(self.sprite, self.position)
 
 
 
@@ -365,11 +377,12 @@ def destroyEnemys(list):
 
 
 def destroyPlataforms(list):
-    for i in list:
-        if i.position[0] < -100:
-            list.remove(i)
-        elif i.position[0] > 448:
-            list.remove(i)
+    """Destruye plataformas que han salido completamente de la pantalla."""
+    for i in list[:]:  # Itera sobre una copia de la lista para evitar modificarla mientras iteramos
+        if i.position[0] + i.sprite.get_width() < 0 or i.position[0] > screen_width:  
+            list.remove(i)  # Elimina la plataforma cuando haya salido completamente de la pantalla
+
+
 
 def createEnemys(list,enemys,game):
     for i, tick in enumerate(list):
@@ -377,27 +390,27 @@ def createEnemys(list,enemys,game):
         if tick <= 0:
             if i == 0:
                 list[0] = (40*game.speed)/game.level
-                position_init = [screen_width - sprite_car1.get_width(), 710]  # Inicia en el borde derecho visible
+                position_init = [screen_width - sprite_car1.get_width(), 705]  # Inicia en el borde derecho visible
                 enemy = Enemy(position_init, sprite_car1, "left", 1)
                 enemys.append(enemy)
             elif i == 1:
                 list[1] = (30*game.speed)/game.level
-                position_init = [-sprite_car1.get_width(), 650]  # entra por la izquierda
+                position_init = [-sprite_car1.get_width(), 645]  # entra por la izquierda
                 enemy = Enemy(position_init, sprite_car2, "right", 2)
                 enemys.append(enemy)
             elif i == 2:
                 list[2] = (40*game.speed)/game.level
-                position_init = [screen_width - sprite_car1.get_width(), 600]  # entra por la derecha
+                position_init = [screen_width - sprite_car1.get_width(), 595]  # entra por la derecha
                 enemy = Enemy(position_init, sprite_car3, "left", 2)
                 enemys.append(enemy)
             elif i == 3:
                 list[3] = (30*game.speed)/game.level
-                position_init = [-sprite_car1.get_width(), 545]  # entra por la izquierda
+                position_init = [-sprite_car1.get_width(), 540]  # entra por la izquierda
                 enemy = Enemy(position_init, sprite_car4, "right", 1)
                 enemys.append(enemy)
             elif i == 4:
                 list[4] = (50*game.speed)/game.level
-                position_init = [screen_width - sprite_car1.get_width(), 480]  # entra por la derecha
+                position_init = [screen_width - sprite_car1.get_width(), 475]  # entra por la derecha
                 enemy = Enemy(position_init, sprite_car5, "left", 1)
                 enemys.append(enemy)
 
@@ -407,43 +420,46 @@ def createPlataform(list, plataforms, game, homes):
         list[i] = list[i] - 1
         if tick <= 0:
             if i == 0:  # Tres tortugas en fila (primera fila)
-                list[0] = (30*game.speed)/game.level
-                position_init1 = [-100, 200]
-                position_init2 = [-70, 200]  # Tortuga 2 al lado de la primera
-                position_init3 = [-40, 200]  # Tortuga 3 al lado de la segunda
+                list[0] = (30 * game.speed) / game.level
+                # Inicializar las tres tortugas al mismo tiempo en posiciones cercanas
+                # Ajustamos las posiciones para que las tortugas estén separadas por una distancia pequeña
+                position_init1 = [0, screen_height - 580]
+                position_init2 = [50, screen_height - 580]   # Tortuga 2 al lado de la primera
+                position_init3 = [100, screen_height - 580]   # Tortuga 3 al lado de la segunda
                 plataform1 = Plataform(position_init1, sprite_turtle, "right")
                 plataform2 = Plataform(position_init2, sprite_turtle, "right")
                 plataform3 = Plataform(position_init3, sprite_turtle, "right")
                 plataforms.append(plataform1)
                 plataforms.append(plataform2)
-                plataforms.append(plataform3)
+                plataforms.append(plataform3) 
 
             elif i == 1:  # Tronco
-                list[1] = (30*game.speed)/game.level
-                position_init = [448, 161]
-                plataform = Plataform(position_init, sprite_plataform, "left")  # Tortuga va a la izquierda
+                list[1] = (30 * game.speed) / game.level
+                position_init = [1550, screen_height - 635]  # Posición ajustada para el tronco
+                plataform = Plataform(position_init, sprite_plataform, "left")
                 plataforms.append(plataform)
 
             elif i == 2:  # Tronco
-                list[2] = (40*game.speed)/game.level
-                position_init = [448, 122]
+                list[2] = (40 * game.speed) / game.level
+                position_init = [1550, screen_height - 690]  # Posición ajustada para el tronco
                 plataform = Plataform(position_init, sprite_plataform, "left")
                 plataforms.append(plataform)
 
             elif i == 3:  # Dos tortugas en fila (cuarta fila)
-                list[3] = (40*game.speed)/game.level
-                position_init1 = [-100, 83]  # Tortuga 1 en la cuarta fila
-                position_init2 = [-70, 83]  # Tortuga 2 al lado de la primera
+                list[3] = (40 * game.speed) / game.level
+                position_init1 = [0, screen_height - 750]  # Posición ajustada para tortugas
+                position_init2 = [50, screen_height - 750]
                 plataform1 = Plataform(position_init1, sprite_turtle, "right")
-                plataform2 = Plataform(position_init2, sprite_turtle, "right")  # Mover a la derecha
+                plataform2 = Plataform(position_init2, sprite_turtle, "right")
                 plataforms.append(plataform1)
                 plataforms.append(plataform2)
 
             elif i == 4:  # Tronco
-                list[4] = (20*game.speed)/game.level
-                position_init = [448, 44]
+                list[4] = (20 * game.speed) / game.level
+                position_init = [1550, screen_height - 810]  # Posición ajustada para tronco
                 plataform = Plataform(position_init, sprite_plataform, "left")
                 plataforms.append(plataform)
+
 
             # Agregar los arbustos en la parte inferior de la pantalla
             # Cambiar la posición de los arbustos a la parte superior de la pantalla
@@ -507,20 +523,6 @@ def createPlataform(list, plataforms, game, homes):
             fill_obj = Object(position_init_fill, sprite_fill)  # Crear el objeto de relleno
             homes.append(fill_obj)
 
-# def carChangeRoad(enemys):
-#     enemy = Random.choice(enemys)
-#     initialPosition = enemy.position[1]
-
-#     choice = Random.randint(1,2)
-#     if (choice % 2 == 0):
-#         enemy.position[1] = enemy.position[1] + 39
-#     else :
-#         enemy.position[1] = enemy.position[1] - 39
-
-#     if enemy.position[1] > 436:
-#         enemy.position[1] = initialPosition
-#     elif enemy.position[1] < 280:
-#         enemy.position[1] = initialPosition
 
 
 def frogOnTheStreet(frog,enemys,game):
@@ -620,15 +622,16 @@ def draw_time_bar(game):
     # El ancho total de la barra es de 100 píxeles, así que calculamos el ancho que debe tener la barra verde
     bar_width = int((time_left / total_time) * 100)  # La barra verde se reducirá según el tiempo restante
 
-    # Dibuja la barra negra (fondo) primero
-    pygame.draw.rect(screen, (0, 0, 0), (285, 520, 100, 20))  # Barra negra de fondo
+    # Dibuja la barra negra (fondo) primero, en x = 1400
+    pygame.draw.rect(screen, (0, 0, 0), (1400, screen_height - 40, 100, 20))  # Barra negra de fondo
     
-    # Luego dibuja la barra verde (tiempo restante)
-    pygame.draw.rect(screen, (0, 255, 0), (285, 520, bar_width, 20))  # Barra verde que disminuye
+    # Luego dibuja la barra verde (tiempo restante) en x = 1400
+    pygame.draw.rect(screen, (0, 255, 0), (1400, screen_height - 40, bar_width, 20))  # Barra verde que disminuye
     
     # Dibuja la palabra "TIME" a la derecha de la barra
     time_text = menu_font.render("TIME", True, (255, 255, 0))  # Color blanco para el texto
-    screen.blit(time_text, (385, 518))  # Ajustamos la posición para que siempre esté a la derecha de la barra
+    screen.blit(time_text, (1500, screen_height - 38))  # Ajustamos la posición para que siempre esté a la derecha de la barra
+
 
 
 def draw_score(game):
@@ -687,7 +690,7 @@ while True:
     gameInit = 1
     game = Game(3, 1)
     key_up = 1
-    frog_initial_position = [207, 475]
+    frog_initial_position = [screen_width // 2 - sprite_sapo.get_width() // 2, screen_height - 100]
     frog = Frog(frog_initial_position, sprite_sapo)
 
     enemys = []
@@ -739,7 +742,7 @@ while True:
         #screen.blit(text_info1, (10, 520))
 
         # Dibuja las vidas restantes
-        draw_lives(frog, 10, 520)
+        draw_lives(frog, 40, screen_height - 50)
         # Dibuja los enemigos, plataformas y arbustos
         drawList(enemys)
         drawList(plataforms)
