@@ -592,27 +592,29 @@ def frogOnTheStreet(frog,enemys,game):
             hit_sound.play()
             frog.frogDead(game)
 
-def frogInTheLake(frog,plataforms,game):
-    #se o sapo esta sob alguma plataforma Seguro = 1
+def frogInTheLake(frog, plataforms, game):
+    # Se asegura de que la rana suba a la plataforma y se mueva con ella
     seguro = 0
     wayPlataform = ""
     for i in plataforms:
         plataformRect = i.rect()
         frogRect = frog.rect()
+        # Verifica si la rana está sobre una plataforma
         if frogRect.colliderect(plataformRect):
             seguro = 1
             wayPlataform = i.way
+            # Si la rana está en la plataforma, mueve la rana con la plataforma
+            if wayPlataform == "right":
+                frog.position[0] += game.speed  # Mueve la rana hacia la derecha con la plataforma
+            elif wayPlataform == "left":
+                frog.position[0] -= game.speed  # Mueve la rana hacia la izquierda con la plataforma
 
+    # Si la rana no está sobre ninguna plataforma, se considera que se ha caído al agua
     if seguro == 0:
         agua_sound.play()
         frog.frogDead(game)
 
-    elif seguro == 1:
-        if wayPlataform == "right":
-            frog.position[0] = frog.position[0] + game.speed
 
-        elif wayPlataform == "left":
-            frog.position[0] = frog.position[0] - game.speed
 
 def frogArrived(frog,chegaram,game):
     if frog.position[0] > 33 and frog.position[0] < 53:
@@ -643,17 +645,27 @@ def frogArrived(frog,chegaram,game):
 
 
 def whereIsTheFrog(frog):
-    #Se o sapo ainda não passou da estrada
-    if frog.position[1] > 240 :
-        frogOnTheStreet(frog,enemys,game)
+    # Actualiza los límites de la calle, el lago y el destino según las nuevas medidas de la pantalla
+    # La calle será la parte inferior, hasta un límite determinado (por ejemplo, la mitad de la pantalla).
+    # El lago estará por encima de la calle, y el destino está en la parte superior de la pantalla.
+    
+    # Definir el nuevo límite entre la calle y el lago (por ejemplo, la mitad de la pantalla)
+    street_limit = screen_height -500  # Ajuste del límite de la calle
 
-    #Se o sapo chegou no rio
-    elif frog.position[1] < 240 and frog.position[1] > 40:
-        frogInTheLake(frog,plataforms,game)
+    # El límite superior del lago será la parte que está encima de la calle
+    lake_limit = street_limit - 70  # Puede ajustarse según lo necesario
 
-    #sapo chegou no objetivo
-    elif frog.position[1] < 40 :
-        frogArrived(frog,chegaram,game)
+    # El destino de la rana es la parte superior de la pantalla, por debajo de un cierto espacio (por ejemplo, 40 píxeles)
+    destination_limit = 40  # Límite para la zona del destino
+
+    if frog.position[1] > street_limit:  # En la calle (zona inferior de la pantalla)
+        frogOnTheStreet(frog, enemys, game)
+    elif frog.position[1] <= street_limit and frog.position[1] > lake_limit:  # En el lago (zona intermedia)
+        frogInTheLake(frog, plataforms, game)
+    elif frog.position[1] <= lake_limit and frog.position[1] > destination_limit:  # En la zona de destino
+        frogArrived(frog, chegaram, game)
+
+
 
 
 # Load the image for the time bar (assuming a width of 100)
