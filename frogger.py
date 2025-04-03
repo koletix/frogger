@@ -43,7 +43,7 @@ menu_font = pygame.font.Font(font_path, 30)  # For the menu font
 # --- Carregando imagens ---
 background_filename = './frogger/images/bg2.png'
 
-frog_filename = './frogger/images/sprite_sheets_up.png'
+frog_filename = './frogger/images/pruebaup.png'
 arrived_filename = './frogger/images/frog_arrived.png'
 car1_filename = './frogger/images/car1.png'
 car2_filename = './frogger/images/car2.png'
@@ -137,16 +137,16 @@ class Frog(Object):
         if self.way != key_pressed:
             self.way = key_pressed
             if self.way == "up":
-                frog_filename = './frogger/images/sprite_sheets_up.png'
+                frog_filename = './frogger/images/pruebaup.png'
                 self.sprite = pygame.image.load(frog_filename).convert_alpha()
             elif self.way == "down":
-                frog_filename = './frogger/images/sprite_sheets_down.png'
+                frog_filename = './frogger/images/pruebadown.png'
                 self.sprite = pygame.image.load(frog_filename).convert_alpha()
             elif self.way == "left":
-                frog_filename = './frogger/images/sprite_sheets_left.png'
+                frog_filename = './frogger/images/pruebaleft.png'
                 self.sprite = pygame.image.load(frog_filename).convert_alpha()
             elif self.way == "right":
-                frog_filename = './frogger/images/sprite_sheets_right.png'
+                frog_filename = './frogger/images/pruebaright.png'
                 self.sprite = pygame.image.load(frog_filename).convert_alpha()
 
     def moveFrog(self, key_pressed, key_up):
@@ -157,7 +157,7 @@ class Frog(Object):
         if key_up == 1:
             if key_pressed == "up":
                 if self.position[1] > game_boundary_top:
-                    self.position[1] -= 16
+                    self.position[1] -= 21
             elif key_pressed == "down":
                 if self.position[1] < game_boundary_bottom:
                     self.position[1] += 13
@@ -206,11 +206,11 @@ class Frog(Object):
         self.position = [770, screen_height - 100]
 
     def draw(self):
-        current_sprite = self.animation_counter * 30
-        screen.blit(self.sprite, (self.position), (0 + current_sprite, 0, 30, 30 + current_sprite))
+        current_sprite = self.animation_counter * 60
+        screen.blit(self.sprite, (self.position), (0 + current_sprite, 0, 60, 60 + current_sprite))
 
     def rect(self):
-        return Rect(self.position[0], self.position[1], 30, 30)
+        return Rect(self.position[0], self.position[1], 60, 60)
 
 
 def save_high_score(game):
@@ -855,8 +855,8 @@ while True:
 
         screen.blit(background, (0, 0))
         text = game_font.render('GAME OVER', 1, (255, 0, 0))
-        text_points = game_font.render(('Pontuação: {0}'.format(game.points)), 1, (255, 0, 0))
-        text_reiniciar = info_font.render('Pressione qualquer tecla para reiniciar!', 1, (255, 0, 0))
+        text_points = game_font.render(('Score: {0}'.format(game.points)), 1, (255, 0, 0))
+        text_reiniciar = info_font.render('Press any button to reset!', 1, (255, 0, 0))
         screen.blit(text, (75, 120))
         screen.blit(text_points, (10, 170))
         screen.blit(text_reiniciar, (70, 250))
