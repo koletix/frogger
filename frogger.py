@@ -766,16 +766,16 @@ def draw_time_bar(game):
 def draw_score(game):
     # "HI-SCORE" en blanco y puntaje en rojo
     high_score_text = menu_font.render("HI-SCORE", True, (255, 255, 255))  # White for the text
-    screen.blit(high_score_text, (280, 10))  # Adjust the position for "HI-SCORE"
+    screen.blit(high_score_text, (screen_width - 710, 10))  # Adjust the position for "HI-SCORE"
 
     high_score_value_text = menu_font.render(f"{game.high_score:05d}", True, (255, 0, 0))  # Red for the score
-    screen.blit(high_score_value_text, (300, 30))  # Adjust the position for the "HI-SCORE" score
+    screen.blit(high_score_value_text, (screen_width - 690, 30))  # Adjust the position for the "HI-SCORE" score
 
     one_up_text = menu_font.render("1-UP", True, (255, 255, 255))  # White for the text
-    screen.blit(one_up_text, (120, 10))  # Adjust the position for "1-UP"
+    screen.blit(one_up_text, (screen_width - 1040, 10))  # Adjust the position for "1-UP"
 
     one_up_value_text = menu_font.render(f"{game.points:05d}", True, (255, 0, 0))  # Red for the score
-    screen.blit(one_up_value_text, (105, 30))  # Adjust the position for the "1-UP" score
+    screen.blit(one_up_value_text, (screen_width - 1060, 30))  # Adjust the position for the "1-UP" score
 
 
 def createArrived(frog,chegaram,game,position_init):
