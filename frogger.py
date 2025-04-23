@@ -309,24 +309,17 @@ class Enemy(Object):
 
 
 class Plataform(Object):
-    def __init__(self, position, sprite_plataform, way, is_turtle=False):
+    def __init__(self, position, sprite_plataform, way):
         self.sprite = sprite_plataform
         self.position = position
         self.way = way
-        self.is_turtle = is_turtle  # Indica si la plataforma es una tortuga
-
-        if self.is_turtle:
-            # Ajuste específico para las tortugas
-            self.collision_rect = Rect(self.position[0], self.position[1], sprite_plataform.get_width() + 0, sprite_plataform.get_height() + 0)
-        else:
-            # Ajuste específico para los troncos
-            self.collision_rect = Rect(self.position[0], self.position[1], sprite_plataform.get_width() + 2, sprite_plataform.get_height() + 2)
+        self.collision_rect = Rect(self.position[0], self.position[1], sprite_plataform.get_width(), sprite_plataform.get_height())
 
     def move(self, speed):
         if self.way == "right":
-            self.position[0] += speed
+            self.position[0] += speed  # Mueve la plataforma a la derecha
         elif self.way == "left":
-            self.position[0] -= speed
+            self.position[0] -= speed  # Mueve la plataforma a la izquierda
         
         # Actualiza el rectángulo de colisión
         self.collision_rect.topleft = self.position
@@ -337,6 +330,8 @@ class Plataform(Object):
 
     def rect(self):
         return self.collision_rect
+
+
 
 
 
@@ -608,33 +603,21 @@ def frogOnTheStreet(frog,enemys,game):
 
 def frogInTheLake(frog, plataforms, game):
     seguro = 0
+    wayPlataform = ""
     for i in plataforms:
         plataformRect = i.rect()
         frogRect = frog.rect()
 
-        # Verifica si la rana está sobre una plataforma
+        # Verifica si la rana está dentro del área de colisión de la plataforma
         if frogRect.colliderect(plataformRect):
             seguro = 1
             wayPlataform = i.way
 
             # Si la rana está en la plataforma, mueve la rana con la plataforma
             if wayPlataform == "right":
-                # Mueve la rana solo si no está sobre el centro de la plataforma
-                if frog.position[0] < i.position[0] + (i.sprite.get_width() // 2) - 5:
-                    frog.position[0] += game.speed  # Mueve la rana hacia la derecha con la plataforma
-                elif frog.position[0] > i.position[0] + (i.sprite.get_width() // 2) + 5:
-                    frog.position[0] -= game.speed  # Mueve la rana hacia la izquierda si se pasa del centro
-                else:
-                    frog.position[0] = i.position[0] + (i.sprite.get_width() // 2)  # Detiene la rana en el centro
-
+                frog.position[0] += game.speed  # Mueve la rana hacia la derecha con la plataforma
             elif wayPlataform == "left":
-                # Mueve la rana solo si no está sobre el centro de la plataforma
-                if frog.position[0] > i.position[0] + (i.sprite.get_width() // 2) + 5:
-                    frog.position[0] -= game.speed  # Mueve la rana hacia la izquierda con la plataforma
-                elif frog.position[0] < i.position[0] + (i.sprite.get_width() // 2) - 5:
-                    frog.position[0] += game.speed  # Mueve la rana hacia la derecha si se pasa del centro
-                else:
-                    frog.position[0] = i.position[0] + (i.sprite.get_width() // 2)  # Detiene la rana en el centro
+                frog.position[0] -= game.speed  # Mueve la rana hacia la izquierda con la plataforma
 
             # Evita que la rana se salga del agua o de la plataforma (ajuste en el eje vertical)
             if frog.position[1] > game_boundary_top:
@@ -644,9 +627,6 @@ def frogInTheLake(frog, plataforms, game):
     if seguro == 0:
         agua_sound.play()
         frog.frogDead(game)
-
-
-
 
 
 
@@ -684,11 +664,7 @@ def drawStreetAndLake():
 
 
 def whereIsTheFrog(frog):
-    # Actualiza los límites de la calle, el lago y el destino según las nuevas medidas de la pantalla
-    # La calle será la parte inferior, hasta un límite determinado (por ejemplo, la mitad de la pantalla).
-    # El lago estará por encima de la calle, y el destino está en la parte superior de la pantalla.
-    
-    # Definir el nuevo límite entre la calle y el lago (por ejemplo, la mitad de la pantalla)
+
     street_limit = screen_height - 525  # Ajuste del límite de la calle
 
     # El límite superior del lago será la parte que está encima de la calle
@@ -864,10 +840,6 @@ while True:
 
         nextLevel(chegaram, enemys, plataforms, frog, game)
 
-        # Mostrar los puntos actuales en la parte inferior
-        #text_info1 = info_font.render(('Points: {1}'.format(game.level, game.points)), 1, (255, 255, 255))
-        
-        # Redibujar la pantalla con fondo y puntajes
         screen.blit(background, (0, 0))  #aaaaaaa
         #screen.blit(text_info1, (10, 520))
 
